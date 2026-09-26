@@ -1,0 +1,122 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+  <meta name="theme-color" content="#f5f3ee" />
+  <meta name="description" content="Jamie Chen — an interactive portfolio in the form of a curious little orb." />
+  <title>Jamie Chen — Interactive Portfolio</title>
+  <link rel="stylesheet" href="style.css" />
+</head>
+<body>
+  <div class="grain" aria-hidden="true"></div>
+  <canvas id="ambient-canvas" aria-hidden="true"></canvas>
+
+  <section id="gate" class="gate" aria-label="Portfolio entrance">
+    <div class="gate-orb-wrap" aria-hidden="true">
+      <div class="orb orb--gate mood-curious">
+        <div class="orb-shine"></div>
+        <span class="eye eye-left"></span>
+        <span class="eye eye-right"></span>
+      </div>
+    </div>
+    <div class="gate-copy">
+      <p class="eyebrow">JAMIE CHEN / PORTFOLIO</p>
+      <h1>This portfolio<br><em>looks back.</em></h1>
+      <p class="gate-sub">Move your cursor. It notices.<br>Then choose how you want to enter.</p>
+      <div class="gate-actions">
+        <button id="enter-music" class="primary-btn" type="button"><span>Enter with music</span><kbd>↗</kbd></button>
+        <button id="enter-muted" class="text-btn" type="button">Enter muted</button>
+      </div>
+      <p class="microcopy">Sound only starts after you choose. Headphones recommended.</p>
+    </div>
+  </section>
+
+  <main id="app" class="app" aria-hidden="true">
+    <header class="topbar">
+      <a href="#" class="wordmark" id="home-link" aria-label="Jamie Chen home">
+        <span class="wordmark-dot"></span>
+        <span>JAMIE CHEN</span>
+      </a>
+      <div class="topbar-right">
+        <span id="section-indicator" class="section-indicator">ORBIT / 00</span>
+        <button id="music-toggle" class="round-btn" type="button" aria-label="Toggle music" title="Toggle music">
+          <span class="music-bars" aria-hidden="true"><i></i><i></i><i></i></span>
+        </button>
+      </div>
+    </header>
+
+    <section id="orbit" class="orbit-view" aria-labelledby="orbit-title">
+      <div class="orbit-copy">
+        <p class="eyebrow">INTERACTIVE INDEX</p>
+        <h2 id="orbit-title">Don’t scroll.<br><span>Move me.</span></h2>
+        <p class="orbit-instruction"><span class="desktop-only">Drag the orb into a topic.</span><span class="mobile-only">Tap a topic to send the orb there.</span></p>
+      </div>
+
+      <div id="portal-field" class="portal-field" aria-label="Portfolio sections">
+        <button class="portal portal-about" data-section="about" type="button">
+          <span class="portal-index">01</span><span class="portal-label">About</span><span class="portal-meta">The short version</span>
+        </button>
+        <button class="portal portal-work" data-section="work" type="button">
+          <span class="portal-index">02</span><span class="portal-label">Work</span><span class="portal-meta">Experience & strategy</span>
+        </button>
+        <button class="portal portal-projects" data-section="projects" type="button">
+          <span class="portal-index">03</span><span class="portal-label">Projects</span><span class="portal-meta">Selected portfolio</span>
+        </button>
+        <button class="portal portal-leadership" data-section="leadership" type="button">
+          <span class="portal-index">04</span><span class="portal-label">Leadership</span><span class="portal-meta">Community & teams</span>
+        </button>
+        <button class="portal portal-contact" data-section="contact" type="button">
+          <span class="portal-index">05</span><span class="portal-label">Contact</span><span class="portal-meta">Say hello</span>
+        </button>
+      </div>
+
+      <div id="orb-home" class="orb-home" aria-hidden="true"></div>
+      <button id="guide-orb" class="guide-orb mood-neutral" type="button" aria-label="Interactive portfolio guide. Drag me to a section.">
+        <div class="orb orb--main">
+          <div class="orb-shine"></div>
+          <div class="orb-liquid"></div>
+          <span class="eye eye-left"></span>
+          <span class="eye eye-right"></span>
+        </div>
+        <span id="orb-caption" class="orb-caption">grab me</span>
+      </button>
+
+      <div class="orbit-footer">
+        <span>FREMONT, CA</span>
+        <span class="orbit-rule"></span>
+        <span>FINANCE · STRATEGY · SOFTWARE</span>
+      </div>
+    </section>
+
+    <aside id="detail-shell" class="detail-shell" aria-hidden="true">
+      <div class="detail-backdrop" data-close-detail></div>
+      <section class="detail-panel" role="dialog" aria-modal="true" aria-labelledby="detail-title">
+        <div class="detail-head">
+          <div>
+            <p id="detail-kicker" class="eyebrow">01 / ABOUT</p>
+            <h2 id="detail-title">About</h2>
+          </div>
+          <button class="close-btn" type="button" data-close-detail aria-label="Return to orbit">Back to orbit <span>↗</span></button>
+        </div>
+        <div id="detail-content" class="detail-content"></div>
+        <div class="detail-progress"><span id="detail-progress-bar"></span></div>
+      </section>
+    </aside>
+
+    <nav class="mobile-dock" aria-label="Portfolio navigation">
+      <button data-section="about" type="button"><span>01</span>About</button>
+      <button data-section="work" type="button"><span>02</span>Work</button>
+      <button data-section="projects" type="button"><span>03</span>Projects</button>
+      <button data-section="leadership" type="button"><span>04</span>Lead</button>
+      <button data-section="contact" type="button"><span>05</span>Contact</button>
+    </nav>
+  </main>
+
+  <audio id="music" loop preload="auto">
+    <source src="music.mp3" type="audio/mpeg" />
+  </audio>
+
+  <script src="app.js"></script>
+</body>
+</html>
