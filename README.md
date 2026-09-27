@@ -1,32 +1,27 @@
-# Jamie Chen — Interactive Portfolio
+# Jamie Chen Interactive Portfolio — v3
 
-A static, responsive portfolio built around an interactive orb interface.
+A static interactive portfolio centered on direct Canva work links and the original simple black-orb avatar.
+
+## Interaction flow
+
+1. Visitor chooses **Allow music** or **Continue muted**.
+2. Visitor must open **Get to Know Jamie** first.
+3. When they return from the Canva presentation, the rest of the portfolio unlocks.
+4. The avatar remains fixed on screen throughout the experience.
+
+## Avatar interactions
+
+- Eyes track the mouse/touch position.
+- Automatic blinking and subtle floating motion.
+- Project hover/focus changes the eye expression without adding a complicated face.
+- Five rapid taps/clicks trigger swirly dizzy eyes and a wobble.
+- After 18 seconds without interaction, the avatar falls asleep and animated Zzz appear.
+- Any interaction wakes it back up.
 
 ## Run locally
-
-Because the site uses local audio, serve it over HTTP instead of opening `index.html` directly.
 
 ```bash
 python3 -m http.server 8080
 ```
 
 Then open `http://localhost:8080`.
-
-## Main interactions
-
-- Opening gate: **Enter with music** or **Enter muted**.
-- Desktop: drag the orb into one of the five section portals.
-- Mobile: tap the bottom navigation; the same orb changes expression for each section.
-- Project cards open the existing Canva portfolio links in a new tab.
-- Music can be toggled from the top-right button.
-
-## Customize content
-
-All portfolio copy, categories, and external links are in the `PORTFOLIO` object at the top of `app.js`.
-
-## Files
-
-- `index.html` — app structure
-- `style.css` — layout, orb appearance, responsive design
-- `app.js` — drag interaction, facial states, section data, music, particles
-- `music.mp3` — retained from the previous portfolio
