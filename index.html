@@ -6,30 +6,37 @@
   <meta name="theme-color" content="#f3f1eb" />
   <meta name="description" content="Jamie Chen — an interactive portfolio in finance, strategy, software, marketing, and leadership." />
   <title>Jamie Chen — Interactive Portfolio</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=DM+Mono:wght@300;400;500&family=Manrope:wght@400;500;600;700&display=swap" rel="stylesheet" />
   <link rel="stylesheet" href="style.css" />
 </head>
 <body>
+  <canvas id="gpu-bg" class="gpu-bg" aria-hidden="true"></canvas>
+  <canvas id="fish-bg" class="fish-bg" aria-hidden="true"></canvas>
+  <div class="ambient-vignette" aria-hidden="true"></div>
   <div class="grain" aria-hidden="true"></div>
 
-  <aside class="avatar-companion" id="avatar-companion" aria-label="Interactive portfolio companion">
-    <div class="avatar-note" id="avatar-note" aria-live="polite">hi.</div>
-    <div class="zzz" id="zzz" aria-hidden="true">
-      <span>Z</span><span>z</span><span>z</span>
+  <aside class="avatar-companion is-intro" id="avatar-companion" aria-label="Interactive portfolio companion">
+    <div class="avatar-note is-visible" id="avatar-note" aria-live="polite">
+      <span id="avatar-note-text">hi! start with Jamie’s profile.</span>
+      <span class="note-arrow" aria-hidden="true">↘</span>
     </div>
-    <button class="avatar-button" id="avatar-button" type="button" aria-label="Tap the avatar">
+    <div class="zzz" id="zzz" aria-hidden="true"><span>Z</span><span>z</span><span>z</span></div>
+    <button class="avatar-button" id="avatar-button" type="button" aria-label="Drag or tap the avatar">
       <svg class="avatar-svg" id="avatar-svg" viewBox="0 0 240 240" role="img" aria-label="Simple black orb avatar with white eyes">
         <defs>
           <radialGradient id="body-gradient" cx="38%" cy="32%" r="70%">
-            <stop offset="0%" stop-color="#1a1a1e" />
-            <stop offset="100%" stop-color="#08080a" />
+            <stop offset="0%" stop-color="#202027" />
+            <stop offset="100%" stop-color="#08080b" />
           </radialGradient>
           <clipPath id="body-clip"><circle cx="120" cy="120" r="104" /></clipPath>
         </defs>
         <circle class="avatar-body" cx="120" cy="120" r="104" fill="url(#body-gradient)" />
-        <ellipse class="avatar-highlight" cx="92" cy="75" rx="48" ry="31" />
+        <ellipse class="avatar-highlight" cx="92" cy="73" rx="47" ry="29" />
         <g class="normal-eyes" id="normal-eyes" clip-path="url(#body-clip)">
-          <rect class="avatar-eye" id="left-eye" x="76" y="88" width="26" height="42" rx="13" />
-          <rect class="avatar-eye" id="right-eye" x="132" y="88" width="26" height="42" rx="13" />
+          <rect class="avatar-eye" id="left-eye" x="76" y="87" width="26" height="44" rx="13" />
+          <rect class="avatar-eye" id="right-eye" x="132" y="87" width="26" height="44" rx="13" />
         </g>
         <g class="dizzy-eyes" id="dizzy-eyes" aria-hidden="true">
           <path d="M91 107c15-16 26 9 10 15-15 6-28-9-20-25 9-18 38-14 42 9 5 27-25 45-48 29" />
@@ -41,15 +48,15 @@
   </aside>
 
   <section class="entry" id="entry" aria-label="Portfolio entrance">
-    <div class="entry-inner">
-      <p class="eyebrow">JAMIE CHEN / INTERACTIVE PORTFOLIO</p>
-      <h1>Don’t just read it.<br><em>Interact with it.</em></h1>
-      <p class="entry-copy">I built this like a small experience instead of a résumé page. Start with music if you want the full version.</p>
+    <div class="entry-card">
+      <div class="entry-kicker">JAMIE CHEN / INTERACTIVE PORTFOLIO</div>
+      <h1>Hi.<br><em>I’ll show you around.</em></h1>
+      <p>The little orb is your guide. First, it wants you to meet Jamie. After that, the rest of the portfolio unlocks.</p>
       <div class="entry-actions">
-        <button class="button button--dark" id="enter-music" type="button">Allow music <span>↗</span></button>
-        <button class="button button--light" id="enter-muted" type="button">Continue muted</button>
+        <button class="button button--dark" id="enter-music" type="button">Enter with music <span>↗</span></button>
+        <button class="button button--light" id="enter-muted" type="button">Enter muted</button>
       </div>
-      <p class="microcopy">Tip: the little orb reacts to you.</p>
+      <p class="microcopy">On supported phones, entering also enables tilt controls for the avatar.</p>
     </div>
   </section>
 
@@ -64,37 +71,37 @@
       </div>
     </header>
 
-    <section class="intro-gate" id="top">
-      <div class="gate-copy">
-        <p class="eyebrow">STEP 01 / START HERE</p>
-        <h2>Before the work,<br><em>meet the person.</em></h2>
-        <p>I want the portfolio to make more sense after you know who I am, what I care about, and what connects the projects together.</p>
+    <section class="profile-stage" id="top">
+      <div class="profile-copy reveal-on-enter">
+        <p class="eyebrow">STEP 01 / MEET JAMIE</p>
+        <h2>The work lands better<br><em>after the person.</em></h2>
+        <p>Open the profile first. When you come back, your guide will unlock the rest of the portfolio.</p>
+        <div class="profile-hint"><span></span> The avatar is pointing you here.</div>
       </div>
 
-      <div class="gate-card" id="gate-card">
-        <div class="gate-card-top">
-          <span>01</span>
-          <span>REQUIRED FIRST VIEW</span>
-        </div>
-        <div class="gate-card-body">
-          <p>CANVA PRESENTATION</p>
-          <h3>Get to Know Jamie</h3>
-          <p class="gate-description">A quick introduction to my background, interests, and the way I approach the things I build.</p>
-        </div>
-        <a class="gate-open" id="intro-presentation" href="https://canva.link/50kiakbew7sqf70" target="_blank" rel="noopener">
-          <span>Open presentation first</span><b>↗</b>
+      <div class="profile-card-wrap reveal-on-enter">
+        <a class="profile-card" id="intro-presentation" href="https://canva.link/50kiakbew7sqf70" target="_blank" rel="noopener" aria-label="Open Jamie's Get to Know Me presentation">
+          <div class="profile-card-glow" aria-hidden="true"></div>
+          <div class="profile-card-top"><span>PROFILE / 01</span><span>REQUIRED FIRST</span></div>
+          <div class="profile-card-body">
+            <div class="profile-orbit" aria-hidden="true"><i></i><i></i><i></i></div>
+            <p class="profile-type">CANVA PRESENTATION</p>
+            <h3>Get to<br><em>Know Jamie</em></h3>
+            <p>A short introduction to my background, interests, and how I think about the things I build.</p>
+          </div>
+          <div class="profile-card-open"><span>Open Jamie’s profile</span><b>↗</b></div>
         </a>
-        <div class="gate-progress" id="gate-progress">
-          <span class="gate-dot"></span>
-          <span id="gate-status">The rest unlocks when you come back.</span>
-        </div>
+        <div class="profile-status" id="gate-progress"><span class="status-dot"></span><span id="gate-status">The rest unlocks when you return.</span></div>
       </div>
     </section>
 
-    <section class="unlock-message" id="unlock-message" aria-hidden="true">
-      <p class="eyebrow">WELCOME BACK</p>
-      <h2>Now the rest<br><em>makes more sense.</em></h2>
-      <p>Your companion will stay with you. Hover the work, move around, or tap it a few times.</p>
+    <section class="welcome-back" id="unlock-message" aria-hidden="true">
+      <div class="welcome-back-inner">
+        <p class="eyebrow">WELCOME BACK</p>
+        <h2>Now let’s see<br><em>the rest.</em></h2>
+        <p>Your guide missed you. Drag it around, tilt your phone, or let it follow along while you explore.</p>
+        <a href="#projects" class="continue-link">Continue to the portfolio <span>↓</span></a>
+      </div>
     </section>
 
     <section class="projects is-locked" id="projects" aria-hidden="true">
@@ -103,54 +110,36 @@
           <p class="eyebrow">STEP 02 / SELECTED WORK</p>
           <h2>Open the<br><em>actual work.</em></h2>
         </div>
-        <p>Every piece below links directly to its original Canva presentation or document. No fake case-study thumbnails.</p>
+        <p>Every piece goes directly to the original Canva presentation or document. The site is the guide; the portfolio is the point.</p>
       </div>
 
       <div class="project-list">
-        <a class="project-card" href="https://canva.link/mx9tk5k88jsbgel" target="_blank" rel="noopener" data-expression="proud" data-say="This one took the most research.">
-          <span class="project-index">01</span>
-          <div><span class="project-kicker">FINANCE OPERATIONS RESEARCH</span><h3>DECA ICDC Report</h3><p>Customer-driven financial inclusion and CSR strategy developed as a complete written research project.</p></div>
-          <span class="project-arrow">↗</span>
+        <a class="project-card" href="https://canva.link/mx9tk5k88jsbgel" target="_blank" rel="noopener" data-expression="proud" data-say="this one took the most research.">
+          <span class="project-index">01</span><div><span class="project-kicker">FINANCE OPERATIONS RESEARCH</span><h3>DECA ICDC Report</h3><p>Customer-driven financial inclusion and CSR strategy developed as a complete written research project.</p></div><span class="project-arrow">↗</span>
         </a>
-        <a class="project-card" href="https://canva.link/vcnjg5nixm8c9pz" target="_blank" rel="noopener" data-expression="excited" data-say="Same research. Faster story.">
-          <span class="project-index">02</span>
-          <div><span class="project-kicker">PRESENTATION</span><h3>DECA ICDC Slides</h3><p>The visual presentation version of the finance research, built for clarity and speed.</p></div>
-          <span class="project-arrow">↗</span>
+        <a class="project-card" href="https://canva.link/vcnjg5nixm8c9pz" target="_blank" rel="noopener" data-expression="excited" data-say="same research. faster story.">
+          <span class="project-index">02</span><div><span class="project-kicker">PRESENTATION</span><h3>DECA ICDC Slides</h3><p>The visual presentation version of the finance research, built for clarity and speed.</p></div><span class="project-arrow">↗</span>
         </a>
-        <a class="project-card" href="https://canva.link/h4nv8c463fl6r59" target="_blank" rel="noopener" data-expression="focus" data-say="The normal résumé, if you insist.">
-          <span class="project-index">03</span>
-          <div><span class="project-kicker">RÉSUMÉ</span><h3>Jamie Chen Resume</h3><p>A conventional scan of experience, responsibilities, technical skills, and leadership.</p></div>
-          <span class="project-arrow">↗</span>
+        <a class="project-card" href="https://canva.link/h4nv8c463fl6r59" target="_blank" rel="noopener" data-expression="focus" data-say="the normal résumé, if you insist.">
+          <span class="project-index">03</span><div><span class="project-kicker">RÉSUMÉ</span><h3>Jamie Chen Resume</h3><p>A conventional scan of experience, responsibilities, technical skills, and leadership.</p></div><span class="project-arrow">↗</span>
         </a>
-        <a class="project-card" href="https://canva.link/t70yi8uq7v8dfm1" target="_blank" rel="noopener" data-expression="focus" data-say="Consulting mode.">
-          <span class="project-index">04</span>
-          <div><span class="project-kicker">STRATEGY / CONSULTING</span><h3>Asia Consulting Pitch</h3><p>A structured consulting-style recommendation focused on analysis, framing, and decision-making.</p></div>
-          <span class="project-arrow">↗</span>
+        <a class="project-card" href="https://canva.link/t70yi8uq7v8dfm1" target="_blank" rel="noopener" data-expression="focus" data-say="consulting mode.">
+          <span class="project-index">04</span><div><span class="project-kicker">STRATEGY / CONSULTING</span><h3>Asia Consulting Pitch</h3><p>A structured consulting-style recommendation focused on analysis, framing, and decision-making.</p></div><span class="project-arrow">↗</span>
         </a>
-        <a class="project-card" href="https://canva.link/6k2btciat5ohitr" target="_blank" rel="noopener" data-expression="curious" data-say="Real estate makes me curious.">
-          <span class="project-index">05</span>
-          <div><span class="project-kicker">COMMERCIAL REAL ESTATE</span><h3>B3 Investors — Bayfair</h3><p>Commercial property research and prospecting tied to Bayfair revitalization and tenant outreach.</p></div>
-          <span class="project-arrow">↗</span>
+        <a class="project-card" href="https://canva.link/6k2btciat5ohitr" target="_blank" rel="noopener" data-expression="curious" data-say="real estate makes me curious.">
+          <span class="project-index">05</span><div><span class="project-kicker">COMMERCIAL REAL ESTATE</span><h3>B3 Investors — Bayfair</h3><p>Commercial property research and prospecting tied to Bayfair revitalization and tenant outreach.</p></div><span class="project-arrow">↗</span>
         </a>
-        <a class="project-card" href="https://canva.link/wldqghskn356nx7" target="_blank" rel="noopener" data-expression="happy" data-say="This one is more playful.">
-          <span class="project-index">06</span>
-          <div><span class="project-kicker">MARKETING</span><h3>Fusion Marketing</h3><p>Brand, positioning, communication, and visual marketing built around an audience-first approach.</p></div>
-          <span class="project-arrow">↗</span>
+        <a class="project-card" href="https://canva.link/wldqghskn356nx7" target="_blank" rel="noopener" data-expression="happy" data-say="this one is more playful.">
+          <span class="project-index">06</span><div><span class="project-kicker">MARKETING</span><h3>Fusion Marketing</h3><p>Brand, positioning, communication, and visual marketing built around an audience-first approach.</p></div><span class="project-arrow">↗</span>
         </a>
-        <a class="project-card" href="https://canva.link/xh9246xwx1yc0jm" target="_blank" rel="noopener" data-expression="happy" data-say="People work matters too.">
-          <span class="project-index">07</span>
-          <div><span class="project-kicker">LEADERSHIP</span><h3>Youth Leadership</h3><p>Community, event, and team-based leadership work focused on execution and engagement.</p></div>
-          <span class="project-arrow">↗</span>
+        <a class="project-card" href="https://canva.link/xh9246xwx1yc0jm" target="_blank" rel="noopener" data-expression="happy" data-say="people work matters too.">
+          <span class="project-index">07</span><div><span class="project-kicker">LEADERSHIP</span><h3>Youth Leadership</h3><p>Community, event, and team-based leadership work focused on execution and engagement.</p></div><span class="project-arrow">↗</span>
         </a>
-        <a class="project-card" href="https://canva.link/n4cqb38wg15nbdh" target="_blank" rel="noopener" data-expression="wink" data-say="Short pitch. Tiny wink.">
-          <span class="project-index">08</span>
-          <div><span class="project-kicker">PITCH / STRATEGY</span><h3>Irvington Fusion Pitch</h3><p>A concise pitch built around a school and community opportunity.</p></div>
-          <span class="project-arrow">↗</span>
+        <a class="project-card" href="https://canva.link/n4cqb38wg15nbdh" target="_blank" rel="noopener" data-expression="wink" data-say="short pitch. tiny wink.">
+          <span class="project-index">08</span><div><span class="project-kicker">PITCH / STRATEGY</span><h3>Irvington Fusion Pitch</h3><p>A concise pitch built around a school and community opportunity.</p></div><span class="project-arrow">↗</span>
         </a>
-        <a class="project-card" href="https://canva.link/gtpsjl9ljdb9w0p" target="_blank" rel="noopener" data-expression="proud" data-say="A recap of work I actually executed.">
-          <span class="project-index">09</span>
-          <div><span class="project-kicker">EXPERIENCE RECAP</span><h3>B3 Investors Summary</h3><p>A visual summary of research, prospecting, pipeline organization, and outreach work.</p></div>
-          <span class="project-arrow">↗</span>
+        <a class="project-card" href="https://canva.link/gtpsjl9ljdb9w0p" target="_blank" rel="noopener" data-expression="proud" data-say="a recap of work I actually executed.">
+          <span class="project-index">09</span><div><span class="project-kicker">EXPERIENCE RECAP</span><h3>B3 Investors Summary</h3><p>A visual summary of research, prospecting, pipeline organization, and outreach work.</p></div><span class="project-arrow">↗</span>
         </a>
       </div>
     </section>
@@ -159,11 +148,11 @@
       <p class="eyebrow">CONTACT</p>
       <h2>Seen enough?<br><em>Say hello.</em></h2>
       <div class="contact-list">
-        <a href="mailto:djamiechen@gmail.com" data-expression="happy" data-say="Email works."><span>Email</span><b>↗</b></a>
-        <a href="https://www.linkedin.com/in/jamiedchen/" target="_blank" rel="noopener" data-expression="proud" data-say="The polished version."><span>LinkedIn</span><b>↗</b></a>
-        <a href="https://www.instagram.com/djamiechen/" target="_blank" rel="noopener" data-expression="wink" data-say="Less formal over here."><span>Instagram</span><b>↗</b></a>
+        <a href="mailto:djamiechen@gmail.com" data-expression="happy" data-say="email works."><span>Email</span><b>↗</b></a>
+        <a href="https://www.linkedin.com/in/jamiedchen/" target="_blank" rel="noopener" data-expression="proud" data-say="the polished version."><span>LinkedIn</span><b>↗</b></a>
+        <a href="https://www.instagram.com/djamiechen/" target="_blank" rel="noopener" data-expression="wink" data-say="slightly less formal."><span>Instagram</span><b>↗</b></a>
       </div>
-      <div class="footer-meta"><span>FREMONT, CA</span><span>INTERACTIVE PORTFOLIO</span><span>© 2026</span></div>
+      <div class="footer-meta"><span>FREMONT, CA</span><span>FINANCE · STRATEGY · SOFTWARE · MARKETING</span><span>© 2026</span></div>
     </footer>
   </main>
 
