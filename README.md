@@ -1,22 +1,19 @@
-# Jamie Chen Interactive Portfolio — v3
+# Jamie Chen — Interactive Portfolio v4
 
-A static interactive portfolio centered on direct Canva work links and the original simple black-orb avatar.
+A static interactive portfolio centered on the original Canva work and a simple draggable orb companion.
 
-## Interaction flow
+## Experience
 
-1. Visitor chooses **Allow music** or **Continue muted**.
-2. Visitor must open **Get to Know Jamie** first.
-3. When they return from the Canva presentation, the rest of the portfolio unlocks.
-4. The avatar remains fixed on screen throughout the experience.
-
-## Avatar interactions
-
-- Eyes track the mouse/touch position.
-- Automatic blinking and subtle floating motion.
-- Project hover/focus changes the eye expression without adding a complicated face.
-- Five rapid taps/clicks trigger swirly dizzy eyes and a wobble.
-- After 18 seconds without interaction, the avatar falls asleep and animated Zzz appear.
-- Any interaction wakes it back up.
+- The avatar is the first character the visitor meets and directs them to **Get to Know Jamie**.
+- The rest of the portfolio unlocks only after the profile link is opened and the visitor returns.
+- On return, the avatar greets the visitor and guides them toward the selected work.
+- The avatar can be dragged with mouse or touch, carries momentum, and reacts to fast taps.
+- Five rapid taps trigger a dizzy spiral-eye animation.
+- Inactivity triggers sleep and floating `Zzz`; activity wakes it.
+- Supported phones use device orientation as gentle physics input so the avatar slides when the device tilts. iOS motion permission is requested from the entry tap.
+- A particle fish system based on the supplied fish effect swims continuously behind the portfolio.
+- A fullscreen WGSL/WebGPU background follows the uploaded VGPU canary's fragment-effect pattern. It uses explicit uniforms for time, resolution, and pointer position; browsers without WebGPU fall back to the CSS atmosphere.
+- Music remains opt-in and can be toggled from the header.
 
 ## Run locally
 
@@ -24,4 +21,11 @@ A static interactive portfolio centered on direct Canva work links and the origi
 python3 -m http.server 8080
 ```
 
-Then open `http://localhost:8080`.
+Open `http://localhost:8080`.
+
+## Files
+
+- `index.html` — page structure and profile-first flow
+- `style.css` — responsive layout, glass layers, avatar states, interactions
+- `app.js` — profile gate, music, avatar physics, gyro, fish particles, WebGPU effect
+- `music.mp3` — retained portfolio soundtrack
