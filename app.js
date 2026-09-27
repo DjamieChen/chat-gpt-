@@ -1,303 +1,62 @@
-(() => {
-  const $ = (selector, root = document) => root.querySelector(selector);
-  const $$ = (selector, root = document) => [...root.querySelectorAll(selector)];
+const $=(s,r=document)=>r.querySelector(s), $$=(s,r=document)=>[...r.querySelectorAll(s)];
+const entry=$('#entry'),site=$('#site'),audio=$('#music'),sound=$('#sound'),companion=$('#avatar-companion'),avatar=$('#avatar-button'),leftEye=$('#left-eye'),rightEye=$('#right-eye'),note=$('#avatar-note'),noteText=$('#avatar-note-text'),intro=$('#intro-presentation'),profileCard=$('.profile-card'),gate=$('#gate-progress'),gateStatus=$('#gate-status'),projects=$('#projects'),projectsNav=$('#projects-nav'),welcome=$('#unlock-message');
+const reduced=matchMedia('(prefers-reduced-motion: reduce)').matches, coarse=matchMedia('(pointer: coarse)').matches;
+let entered=false,unlocked=sessionStorage.getItem('jamie-profile-unlocked')==='1',waiting=false,leftProfile=false,launchAt=0,noteTimer,expressionTimer,idleTimer,sleepy=false,dizzy=false,clickTimes=[];
+let pointer={x:innerWidth/2,y:innerHeight/2,active:false};
 
-  const entry = $('#entry');
-  const site = $('#site');
-  const music = $('#music');
-  const sound = $('#sound');
-  const enterMusic = $('#enter-music');
-  const enterMuted = $('#enter-muted');
-  const introLink = $('#intro-presentation');
-  const gateProgress = $('#gate-progress');
-  const gateStatus = $('#gate-status');
-  const projects = $('#projects');
-  const projectsNav = $('#projects-nav');
-  const unlockMessage = $('#unlock-message');
+function say(m,d=3200){clearTimeout(noteTimer);noteText.textContent=m;note.classList.add('is-visible');if(d>0)noteTimer=setTimeout(()=>note.classList.remove('is-visible'),d)}
+function soundUI(on){sound.classList.toggle('is-on',on);sound.setAttribute('aria-label',on?'Pause music':'Play music')}
+async function playMusic(){try{audio.volume=.48;await audio.play();soundUI(true)}catch{soundUI(false)}}
+sound.addEventListener('click',async()=>{wake();resetIdle();if(audio.paused)await playMusic();else{audio.pause();soundUI(false)}});
+async function enter(withMusic){if(entered)return;entered=true;const gyro=requestGyro();if(withMusic)await playMusic();gyro.catch(()=>{});entry.classList.add('is-gone');site.classList.add('is-visible');site.setAttribute('aria-hidden','false');setTimeout(()=>{companion.classList.remove('is-intro');placeDefault();say(unlocked?'welcome back. let’s keep exploring.':'first, click Jamie’s profile →',4800);resetIdle()},520);if(unlocked)unlock(false)}
+$('#enter-music').addEventListener('click',()=>enter(true));$('#enter-muted').addEventListener('click',()=>enter(false));
 
-  const companion = $('#avatar-companion');
-  const avatarButton = $('#avatar-button');
-  const leftEye = $('#left-eye');
-  const rightEye = $('#right-eye');
-  const note = $('#avatar-note');
+intro.addEventListener('click',()=>{waiting=true;leftProfile=false;launchAt=Date.now();gateStatus.textContent='Have a look — I’ll be right here.';say('see you in a second. i’ll wait here.',2600)});
+const markLeft=()=>{if(waiting)leftProfile=true};window.addEventListener('blur',markLeft);document.addEventListener('visibilitychange',()=>document.hidden?markLeft():maybeBack());window.addEventListener('focus',maybeBack);
+function maybeBack(){if(!waiting||!leftProfile||Date.now()-launchAt<650)return;waiting=false;unlock(true)}
+function unlock(greet=true){unlocked=true;sessionStorage.setItem('jamie-profile-unlocked','1');gate.classList.add('is-ready');gateStatus.textContent='Profile viewed. Portfolio unlocked.';projects.classList.remove('is-locked');projects.classList.add('is-unlocked');projects.setAttribute('aria-hidden','false');projectsNav.classList.remove('nav-link--locked');projectsNav.removeAttribute('aria-disabled');welcome.classList.add('is-visible');welcome.setAttribute('aria-hidden','false');if(greet){wake();say('welcome back, i missed you. let’s go see the rest of the portfolio.',7200);setExpression('happy',2800);setTimeout(()=>welcome.scrollIntoView({behavior:reduced?'auto':'smooth',block:'center'}),1000)}}
 
-  let musicWanted = false;
-  let noteTimer = null;
-  let idleTimer = null;
-  let sleepy = false;
-  let dizzy = false;
-  let introOpened = false;
-  let introLeftPage = false;
-  let lastPointer = { x: innerWidth / 2, y: innerHeight / 2 };
-  let eyeX = 0;
-  let eyeY = 0;
-  let targetEyeX = 0;
-  let targetEyeY = 0;
-  let expression = 'neutral';
-  const clickTimes = [];
+let eyeX=0,eyeY=0,targetEyeX=0,targetEyeY=0,expression='neutral';
+function setExpression(name='neutral',d=1000){if(dizzy||sleepy)return;clearTimeout(expressionTimer);['happy','focus','excited','proud','wink','curious'].forEach(v=>companion.classList.remove(`expression-${v}`));expression=name;if(name!=='neutral')companion.classList.add(`expression-${name}`);if(d>0)expressionTimer=setTimeout(()=>{companion.classList.remove(`expression-${expression}`);expression='neutral'},d)}
+function eyeTarget(x,y){if(dizzy||sleepy)return;const r=avatar.getBoundingClientRect(),dx=x-(r.left+r.width/2),dy=y-(r.top+r.height/2),m=Math.hypot(dx,dy)||1,rad=Math.min(8,r.width*.055);targetEyeX=dx/m*rad;targetEyeY=dy/m*rad}
+(function eyes(){eyeX+=(targetEyeX-eyeX)*.14;eyeY+=(targetEyeY-eyeY)*.14;if(!dizzy&&!sleepy){leftEye.style.transform=`translate(${eyeX}px,${eyeY}px)`;rightEye.style.transform=`translate(${eyeX}px,${eyeY}px)`}requestAnimationFrame(eyes)})();
+(function blink(){if(!dizzy&&!sleepy){leftEye.style.height=rightEye.style.height='5px';setTimeout(()=>{leftEye.style.height=rightEye.style.height=''},115)}setTimeout(blink,2700+Math.random()*3600)})();
 
-  const EXPRESSIONS = {
-    neutral: { w: 26, h: 42 },
-    happy: { w: 28, h: 27 },
-    excited: { w: 30, h: 49 },
-    focus: { w: 29, h: 17 },
-    curious: { w: 25, h: 42, split: true },
-    proud: { w: 28, h: 30 },
-    wink: { w: 27, h: 39, wink: true },
-    sleeping: { w: 31, h: 5 },
-  };
+let pos={x:innerWidth-190,y:innerHeight-222},vel={x:0,y:0},drag,lastSample,gyroOn=false,gyroBase=null,tilt={x:0,y:0},lastTilt=0;
+const size=()=>{const r=companion.getBoundingClientRect();return{w:r.width,h:r.height}};
+function clamp(x,y,bounce=false){const{w,h}=size(),minX=6,minY=entered?70:6,maxX=Math.max(minX,innerWidth-w-6),maxY=Math.max(minY,innerHeight-h-6),nx=Math.max(minX,Math.min(maxX,x)),ny=Math.max(minY,Math.min(maxY,y));if(bounce){if(nx!==x)vel.x*=-.46;if(ny!==y)vel.y*=-.46}return{x:nx,y:ny}}
+function renderPos(){if(companion.classList.contains('is-intro'))return;companion.style.left=`${pos.x}px`;companion.style.top=`${pos.y}px`}
+function placeDefault(){const{w,h}=size();pos=clamp(innerWidth-w-12,innerHeight-h-12);vel.x=vel.y=0;renderPos()}
+avatar.addEventListener('pointerdown',e=>{if(!entered||companion.classList.contains('is-intro'))return;wake();resetIdle();avatar.setPointerCapture(e.pointerId);const r=companion.getBoundingClientRect();drag={id:e.pointerId,sx:e.clientX,sy:e.clientY,ox:e.clientX-r.left,oy:e.clientY-r.top,moved:false};lastSample={x:e.clientX,y:e.clientY,t:performance.now()};vel.x=vel.y=0;companion.classList.add('is-dragging')});
+avatar.addEventListener('pointermove',e=>{if(!drag||drag.id!==e.pointerId)return;pos=clamp(e.clientX-drag.ox,e.clientY-drag.oy);renderPos();eyeTarget(e.clientX,e.clientY);if(Math.hypot(e.clientX-drag.sx,e.clientY-drag.sy)>6)drag.moved=true;const now=performance.now(),dt=Math.max(8,now-lastSample.t);vel.x=(e.clientX-lastSample.x)/dt*15;vel.y=(e.clientY-lastSample.y)/dt*15;lastSample={x:e.clientX,y:e.clientY,t:now}});
+function endDrag(e){if(!drag||drag.id!==e.pointerId)return;const tap=!drag.moved;drag=null;companion.classList.remove('is-dragging');if(tap)tapAvatar()}
+avatar.addEventListener('pointerup',endDrag);avatar.addEventListener('pointercancel',endDrag);
+async function requestGyro(){if(!coarse||typeof DeviceOrientationEvent==='undefined')return false;try{if(typeof DeviceOrientationEvent.requestPermission==='function'&&await DeviceOrientationEvent.requestPermission()!=='granted')return false;addEventListener('deviceorientation',onOrientation,{passive:true});gyroOn=true;companion.classList.add('is-tilting');return true}catch{return false}}
+function onOrientation(e){if(e.gamma==null||e.beta==null)return;if(!gyroBase)gyroBase={g:e.gamma,b:e.beta};let gx=Math.max(-28,Math.min(28,e.gamma-gyroBase.g)),gy=Math.max(-28,Math.min(28,e.beta-gyroBase.b)),a=screen.orientation?.angle??window.orientation??0;if(a===90)[gx,gy]=[gy,-gx];else if(a===270||a===-90)[gx,gy]=[-gy,gx];else if(Math.abs(a)===180)[gx,gy]=[-gx,-gy];tilt={x:gx/28,y:gy/28};if(Math.abs(gx)+Math.abs(gy)>5&&performance.now()-lastTilt>800){lastTilt=performance.now();wake();resetIdle()}}
+addEventListener('orientationchange',()=>gyroBase=null);addEventListener('resize',()=>{if(!companion.classList.contains('is-intro')){pos=clamp(pos.x,pos.y);renderPos()}});
+(function physics(){if(entered&&!companion.classList.contains('is-intro')&&!drag){if(gyroOn&&!sleepy){vel.x+=tilt.x*.32;vel.y+=tilt.y*.32}const f=gyroOn?.965:.93;vel.x*=f;vel.y*=f;if(Math.abs(vel.x)>.02||Math.abs(vel.y)>.02){pos=clamp(pos.x+vel.x,pos.y+vel.y,true);renderPos()}}requestAnimationFrame(physics)})();
+function boop(){companion.classList.remove('is-booped');void companion.offsetWidth;companion.classList.add('is-booped');setTimeout(()=>companion.classList.remove('is-booped'),390)}
+function tapAvatar(){const now=performance.now();clickTimes.push(now);while(clickTimes.length&&now-clickTimes[0]>1200)clickTimes.shift();boop();if(clickTimes.length>=5){clickTimes=[];return triggerDizzy()}if(!unlocked){say('first, click Jamie’s profile →',2800);profileCard.animate([{transform:'translateY(0) scale(1)'},{transform:'translateY(-7px) scale(1.012)'},{transform:'translateY(0) scale(1)'}],{duration:640,easing:'cubic-bezier(.22,1,.36,1)'});setExpression('curious',900)}else{const lines=['drag me anywhere.','try tilting your phone.','keep exploring →','five quick taps gets weird.'];say(lines[Math.floor(Math.random()*lines.length)],2200);const rs=['happy','excited','wink','curious'];setExpression(rs[Math.floor(Math.random()*rs.length)],800)}}
+function triggerDizzy(){if(dizzy)return;wake();dizzy=true;companion.classList.add('is-dizzy');say('woah…',2600);targetEyeX=targetEyeY=0;vel.x+=(Math.random()-.5)*5;vel.y+=(Math.random()-.5)*4;setTimeout(()=>{companion.classList.remove('is-dizzy');dizzy=false;say('i’m okay.',1300)},3000)}
+function resetIdle(){clearTimeout(idleTimer);if(entered)idleTimer=setTimeout(sleep,18000)}function sleep(){if(dizzy||drag)return resetIdle();sleepy=true;companion.classList.add('is-sleeping');note.classList.remove('is-visible');targetEyeX=targetEyeY=0;vel.x*=.2;vel.y*=.2}function wake(){if(!sleepy)return;sleepy=false;companion.classList.remove('is-sleeping');say('oh—hi.',1200)}
+['pointermove','pointerdown','keydown','wheel','touchstart'].forEach(type=>addEventListener(type,e=>{if(type==='pointermove'){pointer={x:e.clientX,y:e.clientY,active:true};eyeTarget(e.clientX,e.clientY)}if(entered){wake();resetIdle()}},{passive:true}));addEventListener('pointerleave',()=>pointer.active=false);
+$$('[data-say]').forEach(el=>{const react=()=>{if(!entered||sleepy||dizzy)return;say(el.dataset.say,2400);setExpression(el.dataset.expression||'curious',1200)};el.addEventListener('mouseenter',react);el.addEventListener('focus',react)});
 
-  function say(text, duration = 1700) {
-    if (!text || sleepy) return;
-    note.textContent = text;
-    note.classList.add('is-visible');
-    clearTimeout(noteTimer);
-    noteTimer = setTimeout(() => note.classList.remove('is-visible'), duration);
-  }
+/* Particle fish behavior adapted from the supplied fish effect: spring reassembly, glow, trails, repulsion and organic undulation. */
+function initFish(){if(reduced)return;const c=$('#fish-bg'),ctx=c.getContext('2d',{alpha:true});if(!ctx)return;let W,H,DPR=1,last=performance.now(),fish=[];const mobile=()=>innerWidth<760;
+function template(gap=3){const pts=[];for(let y=-15;y<=15;y+=gap)for(let x=-22;x<=24;x+=gap){const body=(x*x)/(22*22)+(y*y)/(14*14)<=1,tail=x<-15&&Math.abs(y)<(-x-13)*.72;if(!body&&!tail)continue;const edge=Math.abs((x*x)/(22*22)+(y*y)/(14*14)-1)<.28||x<-14,col=y<0?`rgb(${40+Math.max(0,70+x*2)},${160+Math.max(0,50-y*2)},255)`:`rgb(${170+Math.max(0,x)},${70+Math.max(0,80-y)},235)`;pts.push({x,y,col,edge})}return pts}
+const base=template(mobile()?4:3);
+class P{constructor(o,p){this.o=o;this.lx=p.x;this.ly=p.y;this.col=p.col;this.edge=p.edge;this.seed=Math.random()*999;this.s=.55+Math.random()*1.2;this.x=o.x+p.x*o.scale+(Math.random()-.5)*45;this.y=o.y+p.y*o.scale+(Math.random()-.5)*45;this.vx=(Math.random()-.5)*1.2;this.vy=(Math.random()-.5)*1.2;this.streak=p.edge&&Math.random()<.12}u(t){const o=this.o,w=Math.sin(t*.0026+this.ly*.13+o.phase)*(2.1+Math.abs(this.lx)*.025),tx=o.x+o.dir*(this.lx*o.scale+w),ty=o.y+this.ly*o.scale+Math.cos(t*.0017+this.lx*.1+this.seed)*1.4+Math.sin(t*.001+o.phase)*7,dx=this.x-pointer.x,dy=this.y-pointer.y,d2=dx*dx+dy*dy,r=coarse?70:92;if(pointer.active&&d2<r*r){const d=Math.sqrt(d2)||1,f=(1-d/r)*1.6;this.vx+=dx/d*f;this.vy+=dy/d*f}this.vx+=(tx-this.x)*.018;this.vy+=(ty-this.y)*.018;this.vx*=.91;this.vy*=.91;this.x+=this.vx;this.y+=this.vy}d(t){const sp=Math.hypot(this.vx,this.vy);ctx.shadowBlur=this.edge?15:9;ctx.shadowColor=this.col;ctx.fillStyle=this.col;ctx.globalAlpha=.42+.26*(Math.sin(t*.006+this.seed)*.5+.5);ctx.beginPath();ctx.arc(this.x,this.y,this.s+Math.min(sp*.16,.8),0,Math.PI*2);ctx.fill();if(this.streak){ctx.globalAlpha=.1;ctx.strokeStyle=this.col;ctx.lineWidth=.55;ctx.beginPath();ctx.moveTo(this.x,this.y);ctx.lineTo(this.x-this.vx*4.5,this.y-this.vy*4.5);ctx.stroke()}}}
+function make(){const cfg=mobile()?[{x:-120,y:H*.68,scale:3.7,speed:18,dir:1,phase:1.4}]:[{x:-140,y:H*.68,scale:4.5,speed:18,dir:1,phase:.2},{x:W+150,y:H*.27,scale:3.6,speed:13,dir:-1,phase:3.1}];fish=cfg.map(o=>({...o,p:base.map(p=>new P(o,p))}));fish.forEach(o=>o.p.forEach(p=>p.o=o))}
+function resize(){DPR=Math.min(devicePixelRatio||1,1.7);W=innerWidth;H=innerHeight;c.width=W*DPR;c.height=H*DPR;c.style.width=W+'px';c.style.height=H+'px';ctx.setTransform(DPR,0,0,DPR,0,0);make()}addEventListener('resize',resize);resize();
+(function loop(t){const dt=Math.min(40,t-last)/1000;last=t;ctx.globalCompositeOperation='destination-out';ctx.shadowBlur=0;ctx.globalAlpha=.15;ctx.fillStyle='#000';ctx.fillRect(0,0,W,H);ctx.globalCompositeOperation='lighter';for(const o of fish){o.x+=o.speed*o.dir*dt;if(o.dir>0&&o.x>W+175)o.x=-175;if(o.dir<0&&o.x<-175)o.x=W+175;o.p.forEach(p=>{p.u(t);p.d(t)})}ctx.globalAlpha=1;requestAnimationFrame(loop)})(performance.now())}
 
-  function setExpression(name = 'neutral') {
-    if (dizzy || sleepy) return;
-    expression = EXPRESSIONS[name] ? name : 'neutral';
-  }
+/* VGPU-style fragment-only fullscreen pass using native WebGPU so the static site needs no build step. */
+async function initGpu(){const c=$('#gpu-bg');if(reduced||!navigator.gpu)return;try{const ad=await navigator.gpu.requestAdapter({powerPreference:'low-power'});if(!ad)return;const dev=await ad.requestDevice(),ctx=c.getContext('webgpu'),fmt=navigator.gpu.getPreferredCanvasFormat(),mod=dev.createShaderModule({code:`
+struct P{resolution:vec2f,time:f32,motion:f32,pointer:vec2f,pad:vec2f}@group(0)@binding(0)var<uniform>p:P;
+struct O{@builtin(position)pos:vec4f,@location(0)uv:vec2f}
+@vertex fn vs(@builtin(vertex_index)i:u32)->O{var a=array<vec2f,3>(vec2f(-1,-1),vec2f(3,-1),vec2f(-1,3));let q=a[i];var o:O;o.pos=vec4f(q,0,1);o.uv=vec2f(q.x*.5+.5,1-(q.y*.5+.5));return o}
+fn h(q:vec2f)->f32{return fract(sin(dot(q,vec2f(127.1,311.7)))*43758.5453)}
+@fragment fn fs(i:O)->@location(0)vec4f{let ar=p.resolution.x/max(p.resolution.y,1.);let q=(i.uv-vec2f(.5))*vec2f(ar,1.);let t=p.time*.18;let a=sin(q.x*5.2+t+sin(q.y*3.6-t*.7));let b=cos(q.y*6.1-t*1.2+sin(q.x*2.7+t));let d=sin((q.x+q.y)*8.-t*.55);let ca=pow(abs(a*b*.58+d*.24),5.);let pu=(p.pointer/max(p.resolution,vec2f(1.))-vec2f(.5))*vec2f(ar,1.);let gl=exp(-dot(q-pu,q-pu)*5.5);let gr=h(floor(i.pos.xy*.42)+floor(p.time*2.))-.5;var col=vec3f(.953,.945,.918);col=mix(col,vec3f(.67,.93,.97),ca*.13);col=mix(col,vec3f(.80,.75,.98),(a*.5+.5)*.055);col=mix(col,vec3f(.98,.88,.78),(b*.5+.5)*.028);col+=gl*vec3f(.018,.028,.052)*p.motion+gr*.006;return vec4f(col,1.)}`}),pipe=dev.createRenderPipeline({layout:'auto',vertex:{module:mod,entryPoint:'vs'},fragment:{module:mod,entryPoint:'fs',targets:[{format:fmt}]},primitive:{topology:'triangle-list'}}),buf=dev.createBuffer({size:32,usage:GPUBufferUsage.UNIFORM|GPUBufferUsage.COPY_DST}),bg=dev.createBindGroup({layout:pipe.getBindGroupLayout(0),entries:[{binding:0,resource:{buffer:buf}}]});let w=0,h=0;function resize(){const d=Math.min(devicePixelRatio||1,1.5);w=Math.max(1,Math.floor(innerWidth*d));h=Math.max(1,Math.floor(innerHeight*d));if(c.width!==w||c.height!==h){c.width=w;c.height=h;c.style.width=innerWidth+'px';c.style.height=innerHeight+'px';ctx.configure({device:dev,format:fmt,alphaMode:'opaque'})}}resize();addEventListener('resize',resize);const start=performance.now();(function frame(now){if(!document.hidden){resize();const dx=w/innerWidth,dy=h/innerHeight;dev.queue.writeBuffer(buf,0,new Float32Array([w,h,(now-start)/1000,1,pointer.x*dx,pointer.y*dy,0,0]));const enc=dev.createCommandEncoder(),pass=enc.beginRenderPass({colorAttachments:[{view:ctx.getCurrentTexture().createView(),clearValue:{r:.953,g:.945,b:.918,a:1},loadOp:'clear',storeOp:'store'}]});pass.setPipeline(pipe);pass.setBindGroup(0,bg);pass.draw(3);pass.end();dev.queue.submit([enc.finish()])}requestAnimationFrame(frame)})(performance.now())}catch{}}
 
-  function setMusicUI(on) {
-    sound.classList.toggle('is-on', on);
-    sound.setAttribute('aria-label', on ? 'Pause music' : 'Play music');
-  }
-
-  async function playMusic() {
-    musicWanted = true;
-    try {
-      music.volume = 0.52;
-      await music.play();
-      setMusicUI(true);
-    } catch (_) {
-      setMusicUI(false);
-    }
-  }
-
-  function pauseMusic() {
-    musicWanted = false;
-    music.pause();
-    setMusicUI(false);
-  }
-
-  function enterSite(withMusic) {
-    entry.classList.add('is-gone');
-    site.classList.add('is-visible');
-    site.setAttribute('aria-hidden', 'false');
-    if (withMusic) playMusic(); else pauseMusic();
-    say('first, meet me.', 2300);
-    resetIdle();
-  }
-
-  enterMusic.addEventListener('click', () => enterSite(true));
-  enterMuted.addEventListener('click', () => enterSite(false));
-  sound.addEventListener('click', () => music.paused ? playMusic() : pauseMusic());
-
-  function unlockPortfolio() {
-    if (!projects.classList.contains('is-locked')) return;
-    sessionStorage.setItem('jamie-intro-seen', '1');
-    projects.classList.remove('is-locked');
-    projects.classList.add('is-unlocked');
-    projects.setAttribute('aria-hidden', 'false');
-    projectsNav.classList.remove('nav-link--locked');
-    projectsNav.removeAttribute('aria-disabled');
-    unlockMessage.classList.add('is-visible');
-    unlockMessage.setAttribute('aria-hidden', 'false');
-    gateProgress.classList.add('is-ready');
-    gateStatus.textContent = 'Unlocked — thanks for watching.';
-    setExpression('excited');
-    say('welcome back ✦', 2600);
-    setTimeout(() => unlockMessage.scrollIntoView({ behavior: 'smooth', block: 'start' }), 350);
-  }
-
-  if (sessionStorage.getItem('jamie-intro-seen') === '1') {
-    introOpened = true;
-    introLeftPage = true;
-    unlockPortfolio();
-  }
-
-  introLink.addEventListener('click', () => {
-    introOpened = true;
-    introLeftPage = false;
-    gateStatus.textContent = 'Watching for your return…';
-    gateProgress.classList.add('is-ready');
-    setExpression('happy');
-    say('see you in a minute.', 2200);
-  });
-
-  const markAway = () => {
-    if (introOpened && !projects.classList.contains('is-unlocked')) introLeftPage = true;
-  };
-  window.addEventListener('blur', markAway);
-  document.addEventListener('visibilitychange', () => {
-    if (document.hidden) markAway();
-    else if (introOpened && introLeftPage) unlockPortfolio();
-  });
-  window.addEventListener('focus', () => {
-    if (introOpened && introLeftPage) unlockPortfolio();
-    if (musicWanted && music.paused) music.play().then(() => setMusicUI(true)).catch(() => {});
-  });
-
-  document.addEventListener('visibilitychange', () => {
-    if (document.hidden && !music.paused) music.pause();
-    else if (!document.hidden && musicWanted && music.paused) music.play().then(() => setMusicUI(true)).catch(() => {});
-  });
-
-  function updateTarget(x, y) {
-    lastPointer = { x, y };
-    const rect = avatarButton.getBoundingClientRect();
-    const cx = rect.left + rect.width / 2;
-    const cy = rect.top + rect.height / 2;
-    const dx = x - cx;
-    const dy = y - cy;
-    const mag = Math.max(1, Math.hypot(dx, dy));
-    const strength = Math.min(1, mag / 260);
-    targetEyeX = (dx / mag) * 20 * strength;
-    targetEyeY = (dy / mag) * 17 * strength;
-  }
-
-  function eyeLoop() {
-    eyeX += (targetEyeX - eyeX) * 0.14;
-    eyeY += (targetEyeY - eyeY) * 0.14;
-
-    if (!dizzy) {
-      const cfg = sleepy ? EXPRESSIONS.sleeping : EXPRESSIONS[expression] || EXPRESSIONS.neutral;
-      const w = cfg.w;
-      const h = cfg.h;
-      const baseY = 109 - h / 2;
-      const split = cfg.split ? 5 : 0;
-      const blinkH = companion.classList.contains('is-blinking') ? 3 : h;
-      const winkLeftH = cfg.wink ? 4 : blinkH;
-
-      leftEye.setAttribute('width', w);
-      leftEye.setAttribute('height', winkLeftH);
-      leftEye.setAttribute('rx', Math.min(w / 2, winkLeftH / 2));
-      leftEye.setAttribute('ry', Math.min(w / 2, winkLeftH / 2));
-      leftEye.setAttribute('x', 76 + eyeX - split);
-      leftEye.setAttribute('y', 109 - winkLeftH / 2 + eyeY);
-
-      rightEye.setAttribute('width', w);
-      rightEye.setAttribute('height', blinkH);
-      rightEye.setAttribute('rx', Math.min(w / 2, blinkH / 2));
-      rightEye.setAttribute('ry', Math.min(w / 2, blinkH / 2));
-      rightEye.setAttribute('x', 132 + eyeX + split);
-      rightEye.setAttribute('y', baseY + eyeY + (h - blinkH) / 2);
-    }
-    requestAnimationFrame(eyeLoop);
-  }
-  eyeLoop();
-
-  function blink() {
-    if (sleepy || dizzy) return;
-    companion.classList.add('is-blinking');
-    setTimeout(() => companion.classList.remove('is-blinking'), 145);
-  }
-  function scheduleBlink() {
-    setTimeout(() => { blink(); scheduleBlink(); }, 2200 + Math.random() * 3000);
-  }
-  scheduleBlink();
-
-  function boop() {
-    companion.classList.remove('is-booped');
-    void companion.offsetWidth;
-    companion.classList.add('is-booped');
-    setTimeout(() => companion.classList.remove('is-booped'), 380);
-  }
-
-  function triggerDizzy() {
-    if (dizzy) return;
-    wakeUp();
-    dizzy = true;
-    companion.classList.add('is-dizzy');
-    note.textContent = 'woah…';
-    note.classList.add('is-visible');
-    targetEyeX = targetEyeY = 0;
-    setTimeout(() => {
-      companion.classList.remove('is-dizzy');
-      dizzy = false;
-      expression = 'neutral';
-      note.textContent = 'i’m okay.';
-      setTimeout(() => note.classList.remove('is-visible'), 1200);
-    }, 3000);
-  }
-
-  avatarButton.addEventListener('pointerup', () => {
-    const now = performance.now();
-    clickTimes.push(now);
-    while (clickTimes.length && now - clickTimes[0] > 1200) clickTimes.shift();
-    boop();
-    if (clickTimes.length >= 5) {
-      clickTimes.length = 0;
-      triggerDizzy();
-    } else if (!dizzy) {
-      const reactions = ['happy', 'excited', 'wink', 'curious'];
-      expression = reactions[(clickTimes.length - 1) % reactions.length];
-      setTimeout(() => { if (!dizzy && !sleepy) expression = 'neutral'; }, 650);
-    }
-  });
-
-  function sleep() {
-    if (dizzy || entry && !entry.classList.contains('is-gone')) {
-      resetIdle();
-      return;
-    }
-    sleepy = true;
-    companion.classList.add('is-sleeping');
-    note.classList.remove('is-visible');
-    targetEyeX = targetEyeY = 0;
-  }
-
-  function wakeUp() {
-    if (!sleepy) return;
-    sleepy = false;
-    companion.classList.remove('is-sleeping');
-    expression = 'excited';
-    say('oh—hi.', 1000);
-    setTimeout(() => { if (!dizzy && !sleepy) expression = 'neutral'; }, 700);
-  }
-
-  function resetIdle() {
-    if (sleepy) wakeUp();
-    clearTimeout(idleTimer);
-    idleTimer = setTimeout(sleep, 18000);
-  }
-
-  ['pointermove', 'pointerdown', 'touchstart', 'keydown', 'wheel', 'scroll'].forEach(eventName => {
-    window.addEventListener(eventName, resetIdle, { passive: true });
-  });
-
-  window.addEventListener('pointermove', e => updateTarget(e.clientX, e.clientY), { passive: true });
-  window.addEventListener('touchmove', e => {
-    const t = e.touches && e.touches[0];
-    if (t) updateTarget(t.clientX, t.clientY);
-  }, { passive: true });
-
-  const reactives = $$('[data-expression]');
-  reactives.forEach(el => {
-    const enter = () => {
-      setExpression(el.dataset.expression || 'neutral');
-      say(el.dataset.say || '', 1600);
-    };
-    const leave = () => {
-      if (!sleepy && !dizzy) expression = 'neutral';
-    };
-    el.addEventListener('mouseenter', enter);
-    el.addEventListener('focus', enter);
-    el.addEventListener('mouseleave', leave);
-    el.addEventListener('blur', leave);
-  });
-
-  const cards = $$('.project-card');
-  if ('IntersectionObserver' in window && matchMedia('(max-width: 900px)').matches) {
-    const observer = new IntersectionObserver(entries => {
-      const visible = entries.filter(e => e.isIntersecting).sort((a,b) => b.intersectionRatio - a.intersectionRatio)[0];
-      if (!visible || sleepy || dizzy) return;
-      expression = visible.target.dataset.expression || 'neutral';
-    }, { threshold: [0.45, 0.7] });
-    cards.forEach(card => observer.observe(card));
-  }
-
-  resetIdle();
-})();
+initFish();initGpu();if(unlocked){gate.classList.add('is-ready');gateStatus.textContent='Profile viewed. Portfolio unlocked.'}
