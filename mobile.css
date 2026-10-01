@@ -1,0 +1,136 @@
+/* Mobile-specific layout and avatar sizing */
+@media (max-width: 760px) {
+  html, body { width: 100%; max-width: 100%; overflow-x: hidden; }
+  body { -webkit-text-size-adjust: 100%; }
+
+  .topbar {
+    height: 60px;
+    grid-template-columns: 1fr auto;
+    padding: 0 14px;
+    gap: 10px;
+  }
+  .topbar-center { display: none; }
+  .topbar-actions { gap: 10px; }
+  .nav-link { font-size: .64rem; }
+  .sound { width: 34px; height: 34px; }
+
+  .entry { padding: 14px; align-items: end; }
+  .entry::before { inset: 7px; border-radius: 16px; }
+  .entry-card { width: 100%; padding: 0 8px max(24px, env(safe-area-inset-bottom)); }
+  .entry-card h1 { font-size: clamp(2.65rem, 15vw, 4.4rem); line-height: .9; }
+  .entry-card > p { font-size: .82rem; line-height: 1.55; }
+  .entry-actions { gap: 8px; }
+  .button { width: 100%; justify-content: space-between; padding: .82rem 1rem; }
+
+  .profile-stage {
+    min-height: auto;
+    display: block;
+    overflow: visible;
+  }
+  .profile-stage::after { width: 72vw; left: 25%; top: 24%; }
+  .profile-copy {
+    min-height: calc(76svh - 60px);
+    padding: 72px 20px 44px;
+    justify-content: flex-end;
+  }
+  .profile-copy h2 {
+    margin: 12px 0 16px;
+    font-size: clamp(3rem, 15.5vw, 5.2rem);
+    line-height: .88;
+  }
+  .profile-copy > p:not(.eyebrow) { font-size: .9rem; line-height: 1.6; }
+  .profile-hint { margin-top: 18px; font-size: .52rem; }
+
+  .profile-card-wrap {
+    border-left: 0;
+    border-top: 1px solid var(--line);
+    padding: 18px 14px 28px;
+  }
+  .profile-card {
+    min-height: 500px;
+    border-radius: 22px;
+    padding: 18px;
+  }
+  .profile-card:hover { transform: none; }
+  .profile-card h3 { font-size: clamp(2.8rem, 13vw, 4.5rem); }
+
+  .welcome-back-inner,
+  .projects,
+  .footer { padding-left: 20px; padding-right: 20px; }
+  .welcome-back h2,
+  .section-heading h2,
+  .footer h2 { font-size: clamp(3rem, 14vw, 5rem); }
+
+  .section-heading {
+    display: block;
+    padding-top: 72px;
+    padding-bottom: 28px;
+  }
+  .section-heading > p { margin-top: 18px; max-width: none; }
+
+  .project-card {
+    grid-template-columns: 34px 1fr 24px;
+    gap: 10px;
+    padding: 22px 0;
+  }
+  .project-card h3 { font-size: clamp(1.7rem, 8vw, 2.55rem); line-height: 1; }
+  .project-card p { font-size: .8rem; line-height: 1.5; }
+  .project-kicker { font-size: .48rem; }
+
+  .contact-list a { padding: 18px 0; }
+  .footer-meta { gap: 10px; flex-direction: column; align-items: flex-start; }
+
+  /* Smaller companion on phones so it never dominates the content. */
+  .avatar-companion:not(.is-intro) {
+    width: 104px;
+    height: 126px;
+    left: calc(100vw - 116px);
+    top: calc(100svh - 142px);
+  }
+  .avatar-companion:not(.is-intro) .avatar-button {
+    width: 96px;
+    height: 96px;
+  }
+  .avatar-companion:not(.is-intro) .avatar-shadow {
+    width: 58px;
+    height: 12px;
+    bottom: 5px;
+  }
+  .avatar-companion:not(.is-intro) .avatar-note {
+    right: 76px;
+    bottom: 82px;
+    max-width: min(190px, 58vw);
+    padding: .55rem .65rem;
+    font-size: .52rem;
+  }
+  .avatar-companion.is-intro {
+    width: min(54vw, 210px);
+    height: min(62vw, 240px);
+  }
+  .avatar-companion.is-intro .avatar-button {
+    width: min(45vw, 180px);
+    height: min(45vw, 180px);
+  }
+  .avatar-companion.is-intro .avatar-note {
+    right: 52%;
+    bottom: 72%;
+    max-width: 180px;
+    font-size: .58rem;
+  }
+
+  /* mobile.js writes these variables from the phone gyroscope */
+  .avatar-svg {
+    transform-origin: 50% 58%;
+    transform: perspective(420px) rotateX(var(--gyro-head-x, 0deg)) rotateY(var(--gyro-head-y, 0deg)) rotateZ(var(--gyro-head-z, 0deg));
+    transition: transform 80ms linear;
+    will-change: transform;
+  }
+}
+
+@media (max-width: 390px) {
+  .topbar-actions .nav-link:first-child { display: none; }
+  .profile-copy { padding-left: 16px; padding-right: 16px; }
+  .welcome-back-inner, .projects, .footer { padding-left: 16px; padding-right: 16px; }
+  .avatar-companion:not(.is-intro) { width: 92px; height: 112px; }
+  .avatar-companion:not(.is-intro) .avatar-button { width: 84px; height: 84px; }
+}
