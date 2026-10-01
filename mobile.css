@@ -8,6 +8,7 @@
     grid-template-columns: 1fr auto;
     padding: 0 14px;
     gap: 10px;
+    z-index: 190;
   }
   .topbar-center { display: none; }
   .topbar-actions { gap: 10px; }
@@ -79,6 +80,14 @@
 
   .contact-list a { padding: 18px 0; }
   .footer-meta { gap: 10px; flex-direction: column; align-items: flex-start; }
+
+  /* Keep the companion visually behind readable content instead of covering it. */
+  .avatar-companion:not(.is-intro) { z-index: 55; }
+  .site h1, .site h2, .site h3, .site p, .site .eyebrow,
+  .site .profile-hint, .site .profile-card-top, .site .profile-card-open,
+  .site .profile-status, .site .project-index, .site .project-kicker,
+  .site .project-arrow, .site .continue-link, .site .contact-list,
+  .site .footer-meta { position: relative; z-index: 70; }
 
   /* Smaller companion on phones so it never dominates the content. */
   .avatar-companion:not(.is-intro) {
